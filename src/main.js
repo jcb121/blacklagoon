@@ -1,17 +1,14 @@
-	var width = 1536;
-	var height = 1024;
+	//var width = 1536;
+	var width = 800;
+	var height = (width /3) * 2;
 	
 	var renderer = PIXI.autoDetectRenderer(width, height);
 	
-	//Add the canvas to the HTML document
 	document.body.appendChild(renderer.view);
 	
-	//Create a container object called the `stage`
 	var stage = new PIXI.Container();
-	
 	var assets = {};
-	var objects = {};
-	
+	var machine;
 
 	
 	PIXI.loader
@@ -31,28 +28,9 @@
 	function setup(){
 		
 		
-		//objects.reel = new Reel(['coin', 'token1', 'token2', 'item1', 'item2', 'item3', 'item4']);
-		objects.reel = new Reel(['coin', 'token1', 'token2', 'item1']);
-		stage.addChild(objects.reel.container);
-		
-		
-		var machine = new Item('machine');
-		machine.sprite.position.x = 0;
-		machine.sprite.position.y = 0;
-		machine.sprite.scale.x = 1;
-		machine.sprite.scale.y = 1;
-		stage.addChild(machine.sprite);
-		
-		
-		
-		var spin = new PIXI.Sprite(assets.coin.texture);
-		spin.position.x = width/2;
-		spin.position.y = height - 500;
-		spin.scale.x = 1;
-		spin.scale.y = 1;
-		stage.addChild(spin);
-		
-		
+		machine = new Machine('machine');
+		stage.addChild(machine.container);
+				
 		main();
 	}
 	
@@ -69,7 +47,7 @@
 	}
 	
 	function update(delta){
-		objects.reel.update(delta);
+		machine.update(delta);
 	}
 	
 	function draw(){

@@ -1,67 +1,89 @@
-function Reel(_items){
+function Reel(_items, location){
 	var self = this;
 	
-	var item_height = 222;
-	var item_width = 222;
-	var item_spacing = 50;
+	var item_spaced_height = location.height /3
 	
+	var item_height = item_spaced_height / 100 * 80;
+	var item_spacing = item_spaced_height /100 * 20;
+	var item_width = item_height;
 	
-	
-	var width = item_width;
+	var spinning = false;
+	var spin_speed = 1000;
+	var spin_travelled;
+	var spin_travel;
+		
+	var width = location.width;
 	var height = _items.length * item_height + _items.length * item_spacing;
-
+	
+	
 	
 	this.container = new PIXI.Container();
-	this.container.position.x = 175;
-	this.container.position.y = -100;
-	this.container.scale.x = 1;
-	this.container.scale.y = 1;
+	this.container.position.x = location.x;
+	this.container.position.y = location.y + location.height/2 - height /2 + item_spacing /2;
 	
 	this.container.width = width;
 	this.container.height = height;
 	
 	var items = [];
-	var spinning = false;
-	var reelSetup = false;
-	var spin_duration;
-	var speed = 10;
-	
 	_items.forEach(function(item, index){
-		var temp = new Item(item);
-		temp.sprite.x = 0;
-		temp.sprite.y =  index * item_height + index * item_spacing;
 		
-		console.log(temp.sprite.y);
+		var sprite = new PIXI.Sprite(assets[item].texture);
 		
-		temp.sprite.height = 222;
-		temp.sprite.width = 222;
-		temp.sprite.scale.x = 1;
-		temp.sprite.scale.y = 1;
-		
-		items.push(temp)
-		self.container.addChild(temp.sprite);
+		sprite.x = width/2 - item_width/2;
+		sprite.y =  index * item_height + index * item_spacing;
+		sprite.height = item_height;
+		sprite.width = item_width;
+		items.push(sprite);
+		self.container.addChild(sprite);	
 	})
 	
-	var border = new PIXI.Graphics();;
-	border.lineStyle(5, 0xFF0000);
-	border.drawRect(this.container.x, this.container.y, width, height);
-	stage.addChild(border);
-	
-
-	
-
+	this.is_spinning = function(){
+		return spinning;
+	}
 	
 	this.spin = function(){
+				
+		if(!spinning){
+			spinning = true;
+			
+			spin_travelled = 0;
+			spin_travel = Math.ceil(Math.random() * 20) * (item_height + item_spacing);
+		}
+	}
+	
+	this.query = function(position){
 		
 	}
+	
 	this.update = function(delta){
 		
-		items.forEach(function(item){
-			item.update(delta);
-			if(item.sprite.y > height){
-				item.sprite.y = 0;
+		if(spinning){
+			var diff = false;
+			var step_distance = spin_speed * delta; 
+			
+			if(spin_travelled + step_distance > spin_travel){
+				diff = spin_travel - spin_travelled;
+				spinning = false;
 			}
 			
-		})
+			items.forEach(function(item){
+				
+				if(diff === false){
+					item.y += step_distance;
+				}else{
+					item.y += diff;
+				}
+				
+				while(item.y >= height){
+					item.y -= height;
+				}
+			})
+			
+			if(diff === false){
+				spin_travelled += step_distance;
+			}else{
+				spin_travelled += diff;
+			}
+		}	
 	}
 }
