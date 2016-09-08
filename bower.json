@@ -1,0 +1,21 @@
+{
+  "name": "blacklagoon",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "jcb121 <jcb.121@hotmail.co.uk>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/jcb121/blacklagoon",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "pixi.js": "^4.0.1"
+  }
+}
