@@ -12,6 +12,8 @@ function Reel(_items, location){
 	var width = location.width;
 	var height = _items.length * item_height + _items.length * item_spacing;
 	
+	var spin_force = 10;
+	
 	var velocity = 0;
 	var friction = 0.95;
 	var spin_travelled = 0;
@@ -37,9 +39,9 @@ function Reel(_items, location){
 		self.container.addChild(sprite);
 	})
 	
-	function apply_stop_force(){
+	function apply_stop_force(delta){
 		if (spin_travelled < spin_travel ) return;
-		
+				
 		// bouncing past bound; gives a minus number
 		var distance = spin_travel - spin_travelled;
 		var force = distance * 0.3;
@@ -68,22 +70,23 @@ function Reel(_items, location){
 	this.spin = function(){
 		if(!spinning){
 			spinning = true;
-			spin_travel = (Math.ceil(Math.random() * 10 ) + items.length) * (item_height + item_spacing);
+			spin_travel = (Math.ceil(Math.random() * 20 ) + items.length * 2) * (item_height + item_spacing);
 			spin_travelled = 0;
 			
-			//force needed to spin the exact amount of travel;
-			var force = spin_travel * (1 - friction);
+			friction = 1 - (spin_force / spin_travel);
 			
-			//increase the force to over shoot the target causing bounce;
-			apply_force(force * 1.2);
+			console.log(friction);
+
+			apply_force(spin_force * 1.5);
 		}
 	}
 	
-	this.update = function(){
+	this.update = function(delta){
 		apply_stop_force();
 		
 		velocity *= friction;
 		var step = velocity;
+		
 		
 		spin_travelled += step;
 		
