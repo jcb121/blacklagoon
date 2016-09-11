@@ -11,7 +11,8 @@ var gulp = require('gulp'),
     del = require('del'),
     connect = require('gulp-connect'),
     runSequence = require('run-sequence'),
-	mainBowerFiles = require('main-bower-files');
+	mainBowerFiles = require('main-bower-files'),
+	wrap = require("gulp-wrap");
 	//livereload = require('gulp-livereload'),
 	//cache = require('gulp-cache'),
 
@@ -41,9 +42,11 @@ gulp.task('styles', function() {
 
 gulp.task('scripts', function() {
   return gulp.src('src/*.js')
+   
     //.pipe(jshint('.jshintrc'))
     //.pipe(jshint.reporter('default'))
     .pipe(concat('main.js'))
+	.pipe(wrap('(function(){<%= contents %>})()'))
     .pipe(gulp.dest('dist/'))
     //.pipe(rename({suffix: '.min'}))
     //.pipe(uglify())
