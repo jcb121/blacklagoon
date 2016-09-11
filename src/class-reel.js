@@ -8,14 +8,14 @@ function Reel(_items, location){
 	var item_width = item_height;
 	
 	var spinning = false;
-	var spin_speed = 1000;
-	var spin_travelled;
-	var spin_travel;
 		
 	var width = location.width;
 	var height = _items.length * item_height + _items.length * item_spacing;
 	
-	
+	var velocity = 0;
+	var friction = 0.95;
+	var spin_travelled = 0;
+	var spin_travel = 1;
 	
 	this.container = new PIXI.Container();
 	this.container.position.x = location.x;
@@ -34,56 +34,68 @@ function Reel(_items, location){
 		sprite.height = item_height;
 		sprite.width = item_width;
 		items.push(sprite);
-		self.container.addChild(sprite);	
+		self.container.addChild(sprite);
 	})
+	
+	function apply_stop_force(){
+		if (spin_travelled < spin_travel ) return;
+		
+		// bouncing past bound; gives a minus number
+		var distance = spin_travel - spin_travelled;
+		var force = distance * 0.3;
+		// calculate resting position with this force; creates negative force
+		var rest = spin_travelled + (velocity + force) / ( 1 - friction );
+				
+		// apply force if resting position is out of bounds
+		if ( rest > spin_travel ) {
+			apply_force( force );
+			return;
+		}
+		// if in bounds, apply force to align at bounds
+		force = distance * 0.3 - velocity;
+		apply_force( force );
+		spinning = false;
+	}
+	
+	function apply_force(force){
+		velocity += force;
+	}
 	
 	this.is_spinning = function(){
 		return spinning;
 	}
 	
 	this.spin = function(){
-				
 		if(!spinning){
 			spinning = true;
-			
+			spin_travel = (Math.ceil(Math.random() * 10 ) + items.length) * (item_height + item_spacing);
 			spin_travelled = 0;
-			spin_travel = Math.ceil(Math.random() * 20) * (item_height + item_spacing);
+			
+			//force needed to spin the exact amount of travel;
+			var force = spin_travel * (1 - friction);
+			
+			//increase the force to over shoot the target causing bounce;
+			apply_force(force * 1.2);
 		}
 	}
 	
-	this.query = function(position){
+	this.update = function(){
+		apply_stop_force();
 		
-	}
-	
-	this.update = function(delta){
+		velocity *= friction;
+		var step = velocity;
 		
-		if(spinning){
-			var diff = false;
-			var step_distance = spin_speed * delta; 
+		spin_travelled += step;
+		
+		items.forEach(function(item){
+			item.y += step;
 			
-			if(spin_travelled + step_distance > spin_travel){
-				diff = spin_travel - spin_travelled;
-				spinning = false;
+			while(item.y < 0){
+				item.y += height;
 			}
-			
-			items.forEach(function(item){
-				
-				if(diff === false){
-					item.y += step_distance;
-				}else{
-					item.y += diff;
-				}
-				
-				while(item.y >= height){
-					item.y -= height;
-				}
-			})
-			
-			if(diff === false){
-				spin_travelled += step_distance;
-			}else{
-				spin_travelled += diff;
+			while(item.y >= height){
+				item.y -= height;
 			}
-		}	
+		})
 	}
 }
